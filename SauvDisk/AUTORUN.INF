@@ -1,0 +1,2 @@
+[autorun]
+open=pptview.exe /D /L "playlist.txt"
