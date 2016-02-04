@@ -1,0 +1,45 @@
+#include<stdio.h>
+
+
+void sec_suivante(int n)
+/*
+:entree n : int
+:precondition : n est compose de 6 chiffres et represente une heure valide
+:postcondition : affiche l'heure donnee par n a la seconde suivante 
+		 ou erreur si n ne represente pas une heure valide
+*/
+{
+    int h,m,s;
+    s=n%100;
+    m=(n/100)%100;
+    h=n/10000;
+    if(s>=0 && s<60 && m>=0 && m<60 && h>=0 && h<24)
+     {
+            s++;
+            if(s==60)
+             {
+                     s=0;
+                     m++;
+                     }
+            if(m==60)
+             {
+                     m=0;
+                     h++;
+                     }
+            if(h==24) h=0;
+            
+            printf("%dh-%dmn-%ds\n",h,m,s);
+    }
+    else printf("erreur : %d ne represente pas une heure valide\n",n);
+}
+
+
+int main()
+{
+    int m;
+    printf("Donner une heure :");
+    scanf("%d",&m);
+    sec_suivante(m);
+    
+    return 0;
+}

@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)http://liris.cnrs.fr/~mmrissa/ARCHI-CM/Chap-3/#1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    
+    <title>Architecture des Ordinateurs — slides 2013.10.15 documentation</title>
+    
+    <link rel="stylesheet" href="./archis2_files/basic.css" type="text/css">
+    <link rel="stylesheet" href="./archis2_files/styles.css" type="text/css">
+    <link rel="stylesheet" href="./archis2_files/single.css" type="text/css">
+    
+    <link rel="stylesheet" href="./archis2_files/custom.css" type="text/css">
+    
+
+    <link rel="stylesheet" href="./archis2_files/pygments.css" type="text/css">
+    <link rel="top" title="slides 2013.10.15 documentation" href="http://liris.cnrs.fr/~mmrissa/ARCHI-CM/Chap-3/#"> 
+  <meta name="viewport" content="width=1100,height=750"><meta name="apple-mobile-web-app-capable" content="yes"></head>
+  <body class="loaded">
+
+<section id="slide_container" class="slides layout-regular">
+
+
+  <article class="slide level-1 current" id="architecture-des-ordinateurs">
+<h1>Architecture des Ordinateurs</h1>
+<p>Chapitre 3 - Jeux d'instructions et Processeurs</p>
+<blockquote>
+<div>De l'instruction au programme</div></blockquote>
+<div class="line-block">
+<div class="line"><br></div>
+<div class="line"><br></div>
+<div class="line"><br></div>
+</div>
+<p>Copyright 2013 - Michaël Mrissa</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+
+<div class="slide-no">1</div>
+
+</article>
+<article class="slide level-2 next" id="id1">
+<h2>Architecture des Ordinateurs</h2>
+<p>Rappel - Programme du S2</p>
+<blockquote>
+<div><p>12 séances de 2H  + DS</p>
+<p>3 TDs et interrogations</p>
+<ul class="simple">
+<li>Jeux d'instructions et processeurs</li>
+<li>Interruptions</li>
+<li>Entrées/sorties</li>
+<li>Stockage et mémoire</li>
+<li>Performances</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">2</div>
+
+</article>
+<article class="slide level-2 far-next" id="objectifs-pedagogiques-theoriques">
+<h2>Objectifs pédagogiques théoriques</h2>
+<p>Faire le lien entre</p>
+<blockquote>
+<div><ul class="simple">
+<li>Le fonctionnement d'un processeur et la vision de l'utilisateur</li>
+</ul>
+</div></blockquote>
+<p>Connaître</p>
+<blockquote>
+<div><ul class="simple">
+<li>les architectures de processeurs et jeux d'instructions</li>
+<li>Harvard, Von Neumann, RISC, CISC</li>
+</ul>
+</div></blockquote>
+<p>Comprendre</p>
+<blockquote>
+<div><ul class="simple">
+<li>Le fonctionnement d'un processeur</li>
+<li>Les étapes de traitement d'une instruction</li>
+<li>Les échanges avec la mémoire</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">3</div>
+
+</article>
+<article class="slide level-2" id="objectifs-pedagogiques-pratiques">
+<h2>Objectifs pédagogiques pratiques</h2>
+<p>Savoir programmer directement au niveau processeur</p>
+<blockquote>
+<div><ul class="simple">
+<li>Introduction à un langage assembleur (ARM)</li>
+<li>Utilisation des modes d'adressage</li>
+<li>La notion de programme et de procédure</li>
+<li>Passage du langage C à l'assembleur</li>
+<li>Passage de l'assembleur au langage C</li>
+</ul>
+</div></blockquote>
+<p>Savoir structurer et rationaliser son code</p>
+<blockquote>
+<div><ul class="simple">
+<li>Déclaration et utilisation des variables</li>
+<li>Fonctionnement et utilisation des procédures</li>
+<li>Utilisation de la pile</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">4</div>
+
+</article>
+<article class="slide level-2" id="le-paradigme-evenement-action">
+<h2>Le paradigme Evénement/Action</h2>
+<p>Modèle de programmation par "flot de données"</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Paradigme plus proche de la vision "utilisateur"</p>
+<blockquote>
+<div><p>Un événement provoque une action : quand événement alors action</p>
+<p>L'arrivée d'une nouvelle donnée provoque une exécution de code</p>
+<p>Par défaut le processeur "ne fait rien", beaucoup plus naturel…</p>
+<p>=&gt; Ne correspond pas à la réalité dans la machine</p>
+</div></blockquote>
+</li>
+<li><p class="first">On retrouve ce paradigme dans la programmation événementielle (multitâche, Inter Homme Machine)</p>
+<blockquote>
+<div><p>Modèle de fonctionnement des automates (exemple : cafetière)</p>
+<p>Utilisé dans les langages de programmation de haut niveau</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">5</div>
+
+</article>
+<article class="slide level-2" id="programmation-evenementielle">
+<h2>Programmation événementielle</h2>
+<p>Programme défini par :</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Une liste de règles du type :</p>
+<blockquote>
+<div><p>quand je suis dans telle situation et qu'il arrive tel événement</p>
+<p>alors je fais telle action (sinon je ne fais rien).</p>
+</div></blockquote>
+</li>
+<li><p class="first">Une 'situation' est un état</p>
+<blockquote>
+<div><p>Arrivée événement &lt;=&gt; une action : transition</p>
+</div></blockquote>
+</li>
+<li><p class="first">Spécification par un diagramme Etats-Transitions</p>
+<blockquote>
+<div><ul class="simple">
+<li>Présentation visuelle, graphique</li>
+<li>État : un cercle nommé</li>
+<li>Transition : un arc orienté et annoté</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">6</div>
+
+</article>
+<article class="slide level-2" id="id2">
+<h2>Programmation événementielle</h2>
+<p>Exemple : la machine à café</p>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/engineeronadisk-307.gif"><img alt="_images/engineeronadisk-307.gif" src="./archis2_files/engineeronadisk-307.gif" style="width: 27em;"></a>
+</div>
+<p>Source: <a class="reference external" href="http://engineeronadisk.com/V2/book_PLC/engineeronadisk-307.gif">http://engineeronadisk.com/V2/book_PLC/engineeronadisk-307.gif</a></p>
+
+<div class="slide-no">7</div>
+
+</article>
+<article class="slide level-2" id="le-paradigme-procedural">
+<h2>Le paradigme procédural</h2>
+<p>Modèle de programmation par "flot d'instructions" :</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Programmation classique</p>
+<blockquote>
+<div><p>Une procédure est un suite linéaire d'instructions</p>
+</div></blockquote>
+</li>
+<li><p class="first">Ce sont les instructions qui pilotent le déroulement</p>
+<blockquote>
+<div><p>L'instruction utilise des données, qu'elles soient prêtes ou non</p>
+<p>Exécution : le CPU lit les instructions du programme une à une</p>
+<p>Seules variations : les ruptures de séquences, branchements conditionnels (if, for) ou inconditionnels (goto, …)</p>
+<p>=&gt; Utilisé par les langages de bas niveau</p>
+</div></blockquote>
+</li>
+</ul>
+<p>Le processeur travaille tout le temps (pas très naturel…)</p>
+<p>Pourtant, c'est ce qui se passe en réalité !</p>
+</div></blockquote>
+
+<div class="slide-no">8</div>
+
+</article>
+<article class="slide level-2" id="architectures-harvard">
+<h2>Architectures : Harvard</h2>
+<p>mémoires séparées pour données et programmes</p>
+<blockquote>
+<div>chargement en parallèle par bus spécifiques</div></blockquote>
+<p>utilisée pour les processeurs spécialisés (Digital Signal Processor)</p>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/harvard.png"><img alt="_images/harvard.png" src="./archis2_files/harvard.png" style="width: 22em;"></a>
+</div>
+
+<div class="slide-no">9</div>
+
+</article>
+<article class="slide level-2" id="architectures-von-neumann">
+<h2>Architectures : Von Neumann</h2>
+<p>1 mémoire centrale : contient données et programmes</p>
+<blockquote>
+<div><p>bus partagés (données = instructions de programmes ou données à traiter)</p>
+<p>opérations via registres du processeur et transferts registre &lt;=&gt; mémoire</p>
+</div></blockquote>
+<p>la plus courante (CPU à usage général)</p>
+<blockquote>
+<div>Architectures modernes : mixtes Harvard / von Neumann</div></blockquote>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/neumann.png"><img alt="_images/neumann.png" src="./archis2_files/neumann.png" style="width: 20em;"></a>
+</div>
+
+<div class="slide-no">10</div>
+
+</article>
+<article class="slide level-2" id="processeur-vue-externe">
+<h2>Processeur : vue externe</h2>
+<p>Définition</p>
+<blockquote>
+<div><p>Automate enchaînant les instructions</p>
+<p>Effectue des traitements sur les données (internes)</p>
+<p>Effectue des lectures/écritures en mémoire (externe)</p>
+</div></blockquote>
+<p>Modèle de programmation</p>
+<blockquote>
+<div><p>ISA : Instruction Set Architecture, interface matériel/logiciel</p>
+<p>Des instructions du type :</p>
+<p>mov r2, #10</p>
+<p>mov r3, [r4]</p>
+</div></blockquote>
+
+<div class="slide-no">11</div>
+
+</article>
+<article class="slide level-2" id="id3">
+<h2>Processeur : vue externe</h2>
+<p>3 éléments clés :</p>
+<ul>
+<li><p class="first"><strong>Jeu d'instructions</strong></p>
+<blockquote>
+<div><p>ensemble des opérations que le processeur peut effectuer</p>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>Registres</strong> : mémoires du processeur</p>
+<blockquote>
+<div><p>Rôle : stocker les données temporairement pour effectuer des opérations</p>
+<p>Accessibles par le processeur uniquement, perte d'info si CPU arrêté</p>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>Modèle mémoire</strong> : relation processeur/mémoire centrale</p>
+</li>
+</ul>
+
+<div class="slide-no">12</div>
+
+</article>
+<article class="slide level-2" id="instruction-definition">
+<h2>Instruction : définition</h2>
+<p>1 code opératoire : code-op (FR), opcode(EN)</p>
+<blockquote>
+<div><p>indique ce qu'on veut faire exécuter au CPU</p>
+<p>envoyé sous forme binaire au CPU pour être décodé</p>
+</div></blockquote>
+<p>Des opérandes optionnelles</p>
+<blockquote>
+<div>désignent les ressources mémoires qui sont utilisées pour exécuter l'instruction</div></blockquote>
+<dl class="docutils">
+<dt>Ex:</dt>
+<dd><p class="first">mov     r3, #10 : déplace (copie) la valeur 10 (car dièse) vers le registre 3 du CPU</p>
+<p class="last">add     r2, r2, r3 : calcule r2 + r3 et stocke le résultat dans r2</p>
+</dd>
+</dl>
+
+<div class="slide-no">13</div>
+
+</article>
+<article class="slide level-2" id="les-categories-d-instructions">
+<h2>Les catégories d'instructions</h2>
+<p>Arithmétiques et logiques (UAL)</p>
+<blockquote>
+<div>Addition, soustraction, décalages, opérations logiques (ADD, SUB...)</div></blockquote>
+<p>Chargement et mémorisation</p>
+<blockquote>
+<div>registre &lt;==&gt; mémoire (LDR, STR, MOV...)</div></blockquote>
+<p>Contrôle de flot</p>
+<blockquote>
+<div><p>branchements conditionnels (Bxx...), inconditionnels (BRA, JMP)</p>
+<p>appels et retours de procédure (BL)</p>
+</div></blockquote>
+<p>Instructions diverses</p>
+<blockquote>
+<div>I/O, NOP, etc.</div></blockquote>
+
+<div class="slide-no">14</div>
+
+</article>
+<article class="slide level-2" id="jeux-d-instructions-cisc-vs-risc">
+<h2>Jeux d'instructions : CISC vs RISC</h2>
+<p>CISC : Complex Instruction Set Computer</p>
+<blockquote>
+<div><p>instructions complexes, plusieurs cycles d'horloge</p>
+<p>format d'instruction variable</p>
+<p>décodeur complexe (microcode)</p>
+<p>peu de registres, nombreux modes d'adressage</p>
+<p>compilateur plus simple</p>
+</div></blockquote>
+
+<div class="slide-no">15</div>
+
+</article>
+<article class="slide level-2" id="id4">
+<h2>Jeux d'instructions : CISC vs RISC</h2>
+<p>RISC : Reduced Instruction Set Computer</p>
+<blockquote>
+<div><p>instructions sur 1 cycle (ou le moins possible)</p>
+<p>format fixe</p>
+<p>décodeur simple</p>
+<p>nombreux registres, moins de modes d'adressage</p>
+<p>compilateur plus complexe</p>
+</div></blockquote>
+
+<div class="slide-no">16</div>
+
+</article>
+<article class="slide level-2" id="jeux-d-instructions-bilan">
+<h2>Jeux d'instructions : Bilan</h2>
+<p>Aujourd'hui</p>
+<blockquote>
+<div><p>De nombreux jeux d'instructions existent</p>
+<p>Selon les processeurs, les séries</p>
+<p>Selon les usages prévus</p>
+<p>Embarqué, calculs lourds...</p>
+</div></blockquote>
+<p>Caractéristiques</p>
+<blockquote>
+<div><p>Jeux d'instructions de tailles différentes</p>
+<p>Évolution de 8 à 16, 32, 64, 128 bits</p>
+<p>Plusieurs jeux d'instructions pour un seul CPU</p>
+<p>Ex: Thumb (16 bits), NEON (128 bits), etc.</p>
+</div></blockquote>
+
+<div class="slide-no">17</div>
+
+</article>
+<article class="slide level-2" id="architecture-etudiee">
+<h2>Architecture étudiée</h2>
+<p>Pour les processeurs de la série Cortex : ARM v7</p>
+<blockquote>
+<div><p>Architecture 32 bits de type LOAD and STORE</p>
+<blockquote>
+<div>design "propre", séparation des préoccupations</div></blockquote>
+<p>Architecture de type "plutôt" RISC</p>
+<blockquote>
+<div><p>La plupart des instructions s'exécutent en 1 cycle processeur</p>
+<p>Sauf quelques exceptions...</p>
+</div></blockquote>
+<p>Jeu d'instructions 32 bits mais aussi un jeu réduit 16 bits (Thumb)</p>
+<blockquote>
+<div>Présent dans de nombreux dispositifs : Samsung Galaxy S, etc.</div></blockquote>
+<p>Détails : <a class="reference external" href="http://www.youtube.com/watch?v=7LqPJGnBPMM&amp;sf14308533">http://www.youtube.com/watch?v=7LqPJGnBPMM&amp;sf14308533</a></p>
+</div></blockquote>
+
+<div class="slide-no">18</div>
+
+</article>
+<article class="slide level-2" id="id5">
+<h2>Architecture étudiée</h2>
+<p>Processeurs de la famille ARM7</p>
+<blockquote>
+<div>ARM7TDMI(-S), ARM710T, ARM720T, ARM740T MPU, ARM7EJ-S</div></blockquote>
+<p>Utilisation de l'ARM7 dans des produits industriels</p>
+<blockquote>
+<div><p>Audio processing in the SEGA Dreamcast</p>
+<p>D-Link DSL-604+ Wireless ADSL Router</p>
+<p>iPod from Apple, Juice Box, Lego Mindstorms NXT</p>
+<p>Most of Nokia's mobile phone range</p>
+<p>Nintendo DS and Game Boy Advance from Nintendo</p>
+<p>PocketStation, Roomba 500 series from iRobot</p>
+<p>Sirius Satellite Radio receivers</p>
+</div></blockquote>
+
+<div class="slide-no">19</div>
+
+</article>
+<article class="slide level-2" id="illustrations">
+<h2>Illustrations</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/arm-series.png"><img alt="_images/arm-series.png" src="./archis2_files/arm-series.png" style="width: 25em;"></a>
+</div>
+<p>Source : ARM Ltd.</p>
+
+<div class="slide-no">20</div>
+
+</article>
+<article class="slide level-2" id="id6">
+<h2>Illustrations</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/cortex-A8R4M3.png"><img alt="_images/cortex-A8R4M3.png" src="./archis2_files/cortex-A8R4M3.png" style="width: 25em;"></a>
+</div>
+<p>Source : ARM Ltd.</p>
+
+<div class="slide-no">21</div>
+
+</article>
+<article class="slide level-2" id="le-processeur-vue-interne">
+<h2>Le processeur : vue interne</h2>
+<p>2 unités</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>1 unité de contrôle</strong> : dirige le fonctionnement du processeur</li>
+<li><strong>1 unité de traitement</strong> : effectue les traitements sur les données</li>
+<li>Ces 2 unités communiquent entre elles et avec la mémoire centrale</li>
+</ul>
+</div></blockquote>
+<p>Des bus</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><strong>bus</strong> : canal de transmission de données</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>internes</strong> (relient les unités et composants)</li>
+<li><strong>externes</strong> (cpu &lt;=&gt; mémoire centrale)</li>
+<li><strong>spécialisés</strong> (commandes, données, adresses)</li>
+<li><strong>partagés</strong> (données indifférenciées, interprétées selon le contexte)</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">22</div>
+
+</article>
+<article class="slide level-2" id="id7">
+<h2>Le processeur : vue interne</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/cpu-details.png"><img alt="_images/cpu-details.png" src="./archis2_files/cpu-details.png" style="width: 26em;"></a>
+</div>
+<p>Le CPU, la MC, les unités et les bus</p>
+
+<div class="slide-no">23</div>
+
+</article>
+<article class="slide level-2" id="id8">
+<h2>Le processeur : vue interne</h2>
+<p>L'unité de contrôle contient plusieurs registres</p>
+<blockquote>
+<div><p>4 d'entres eux sont primordiaux pour le fonctionnement du processeur</p>
+<ul>
+<li><p class="first">Un <strong>registre d'instruction</strong> (instruction register IR)</p>
+<blockquote>
+<div><ul class="simple">
+<li>stocke les instructions qu'on lui envoie (suites de 0 et 1)</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Un <strong>compteur de programme</strong> (program counter PC)</p>
+<blockquote>
+<div><ul class="simple">
+<li>stocke l'adresse de la prochaine instruction à exécuter</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Un <strong>registre de lien</strong> (link register LR)</p>
+<blockquote>
+<div><ul class="simple">
+<li>enregistre l'adresse de retour de procédure</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Un <strong>Pointeur de pile</strong> (stack pointer SP)</p>
+<blockquote>
+<div><ul class="simple">
+<li>pointe sur (contient l'adresse de) l'adresse mémoire du bout de la pile</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">24</div>
+
+</article>
+<article class="slide level-2" id="id9">
+<h2>Le processeur : vue interne</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/cpu-details2.png"><img alt="_images/cpu-details2.png" src="./archis2_files/cpu-details2.png" style="width: 26em;"></a>
+</div>
+
+<div class="slide-no">25</div>
+
+</article>
+<article class="slide level-2" id="id10">
+<h2>Le processeur : vue interne</h2>
+<p>L'unité de contrôle contient aussi d'autres composants</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Un <strong>décodeur</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>décode les instructions en suites de séquences à exécuter</li>
+<li>fait le lien entre le jeu d'instructions et les actions physiques du processeur</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Un <strong>séquenceur</strong> (bloc logique de commandes)</p>
+<blockquote>
+<div><ul class="simple">
+<li>organise l'exécution des séquences qui réalisent une instruction</li>
+<li>rythmé par une horloge, c'est un automate, le "chef d'orchestre" du processeur</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">26</div>
+
+</article>
+<article class="slide level-2" id="id11">
+<h2>Le processeur : vue interne</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/cpu-details2.png"><img alt="_images/cpu-details2.png" src="./archis2_files/cpu-details2.png" style="width: 26em;"></a>
+</div>
+
+<div class="slide-no">27</div>
+
+</article>
+<article class="slide level-2" id="id12">
+<h2>Le processeur : vue interne</h2>
+<p>L'unité de traitement contient plusieurs composants</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Des <strong>registres</strong> de type accumulateur</p>
+<blockquote>
+<div><ul class="simple">
+<li>stockent de manière temporaire les données à traiter</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Un (ou des) <strong>registre d'état</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>permet de positionner des indicateurs (flags) qui donnent des informations sur la dernière opération effectuée par l'UAL</li>
+<li>Ex: débordement (overflow V), zéro (Z), parité (P), etc.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Une (ou des) <strong>UAL</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>effectue(nt) des opérations de calcul</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">28</div>
+
+</article>
+<article class="slide level-2" id="id13">
+<h2>Le processeur : vue interne</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/cpu-details2.png"><img alt="_images/cpu-details2.png" src="./archis2_files/cpu-details2.png" style="width: 26em;"></a>
+</div>
+
+<div class="slide-no">29</div>
+
+</article>
+<article class="slide level-2" id="execution-d-une-instruction">
+<h2>Exécution d'une instruction</h2>
+<p>3 phases obligatoires + 2 optionnelles</p>
+<blockquote>
+<div><p><strong>fetch</strong> : le processeur récupère l'instruction en mémoire centrale</p>
+<p><strong>decode</strong> : le processeur décode l'instruction</p>
+<p><strong>execute</strong> : le processeur réalise les actions de l'instruction</p>
+<ul class="simple">
+<li>écriture mémoire centrale</li>
+<li>écriture registres (writeback)</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">30</div>
+
+</article>
+<article class="slide level-2" id="id14">
+<h2>Exécution d'une instruction</h2>
+<p>fetch</p>
+<blockquote>
+<div><ul class="simple">
+<li>ordre de lecture en mémoire centrale</li>
+<li>réception de l'instruction par le bus, stockage dans le registre d'instruction (IR)</li>
+</ul>
+</div></blockquote>
+<p>decode</p>
+<blockquote>
+<div><ul class="simple">
+<li>lecture du registre IR par le décodeur</li>
+<li>analyse des 0 et des 1</li>
+<li>programmation des actions dans le séquenceur</li>
+</ul>
+</div></blockquote>
+<p>execute</p>
+<blockquote>
+<div><ul class="simple">
+<li>lecture des opérandes, exécution des opérations, etc</li>
+</ul>
+</div></blockquote>
+<p>options</p>
+<blockquote>
+<div><p>1 - écriture du résultat en mémoire centrale</p>
+<p>2 - écriture dans un registre spécifique (writeback)</p>
+</div></blockquote>
+
+<div class="slide-no">31</div>
+
+</article>
+<article class="slide level-2" id="chargement-memoire-arm-v7">
+<h2>Chargement mémoire (ARM v7)</h2>
+<p>ARM est une architecture LOAD and STORE</p>
+<blockquote>
+<div><p>LOAD : charger dans le processeur (opcode : ldr = LOAD REGISTER)</p>
+<p>STORE : sauvegarder en mémoire (opcode : str = STORE REGISTER)</p>
+<p>Attention à l'ordre des opérandes !!</p>
+</div></blockquote>
+<p>ldr r2, [r4] : de la droite vers la gauche</p>
+<blockquote>
+<div>stocker dans le registre r2 le contenu présent à l'adresse mémoire stockée dans le registre r4, donc de la droite vers la gauche</div></blockquote>
+<p>(Quizz : Que contient r4 ? Que contient r2 avant l'exécution de l'instruction ? Après ?)</p>
+<p>MAIS str r2, [r3] : de la gauche vers la droite !</p>
+<blockquote>
+<div>Stocker le contenu du reg. r2 à l'adresse mémoire stockée dans r3</div></blockquote>
+
+<div class="slide-no">32</div>
+
+</article>
+<article class="slide level-2" id="autres-instructions">
+<h2>Autres instructions</h2>
+<p>Transfert interne au processeur : l'instruction MOV</p>
+<blockquote>
+<div>Ex: MOV r2, r3 - MOV r2, #10</div></blockquote>
+<p>Traitements de données</p>
+<blockquote>
+<div>ADD, SUB, MUL, FDIVD, EOR, BIC, TST...</div></blockquote>
+<p>Branchements conditionnels</p>
+<blockquote>
+<div>if/else/for/while : CMP + Bcc</div></blockquote>
+<p>Branchements inconditionnels</p>
+<blockquote>
+<div>B, BL, ...</div></blockquote>
+<p>Manipulation de la pile (load multiples, store multiples)</p>
+<blockquote>
+<div>STMFD, LDMFD, ...</div></blockquote>
+
+<div class="slide-no">33</div>
+
+</article>
+<article class="slide level-2" id="les-registres-arm-v7">
+<h2>Les registres (ARM v7)</h2>
+<p>A un moment t, on peut accéder à 16 + 1 registres</p>
+<p>16 registres (r0 à r15) de 32 bits chacun</p>
+<blockquote>
+<div><p>de r0 à r3 : passage de paramètres</p>
+<p>si plus de 4 paramètres, on passe par la pile (détails plus tard)</p>
+<p>r0 : retour de résultat</p>
+<p>r13 : stack pointer (SP, pointeur de pile)</p>
+<p>r14 : link register (LR, adresse de retour de procédure)</p>
+<p>r15 : program counter(PC, compteur ordinal)</p>
+</div></blockquote>
+<p>1 registre CPSR</p>
+<blockquote>
+<div>registre de statut du processeur (flags) + infos diverses</div></blockquote>
+
+<div class="slide-no">34</div>
+
+</article>
+<article class="slide level-2" id="id15">
+<h2>Les registres (ARM v7)</h2>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/ARMv7-registers.png"><img alt="_images/ARMv7-registers.png" src="./archis2_files/ARMv7-registers.png" style="width: 25em;"></a>
+</div>
+<p>Source : ARM Ltd</p>
+
+<div class="slide-no">35</div>
+
+</article>
+<article class="slide level-2" id="adressages-1">
+<h2>Adressages (1)</h2>
+<p>Les principaux et plus simples</p>
+<blockquote>
+<div><p>adressage immédiat</p>
+<blockquote>
+<div><p>la donnée est dans le code après l'instruction - Ex: MOV r0, #10</p>
+<p>notation : valeur précédée par dièse (#)</p>
+</div></blockquote>
+<p>adressage absolu</p>
+<blockquote>
+<div><p>on donne l'adresse de la donnée - Ex: LDR r0, .L1</p>
+<p>Charge l'adresse .L1 (adresse relative au programme) dans r0</p>
+</div></blockquote>
+<p><em>NB: les labels sont des adresses relatives au programme courant, ils sont transformés à la compilation en un décalage relatif à PC</em></p>
+</div></blockquote>
+
+<div class="slide-no">36</div>
+
+</article>
+<article class="slide level-2" id="adressages-2">
+<h2>Adressages (2)</h2>
+<p>Les principaux et plus simples</p>
+<blockquote>
+<div><p>adressage direct par registre</p>
+<blockquote>
+<div>on accède au contenu du registre - Ex: LDR r0, r1</div></blockquote>
+<p>adressage indirect par registre</p>
+<blockquote>
+<div>on donne le registre qui contient l'adresse de la donnée - Ex: LDR r0, [r3]</div></blockquote>
+<p>adressage indirect par registre avec décalage</p>
+<blockquote>
+<div><p>idem, avec un décalage en mémoire</p>
+<p>Ex 1: décalage par valeur : STR r0, [r3, #12]</p>
+<p>Ex 2: décalage par registre : STR r0, [r3, r2]</p>
+<p>Ex 3: décalage par "shifting barrel" : STR r1, [r3, r2, asl #2]</p>
+</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">37</div>
+
+</article>
+<article class="slide level-2" id="la-notion-de-programme">
+<h2>La notion de programme</h2>
+<p>Suite cohérente et ordonnée d’instructions</p>
+<blockquote>
+<div><p>Décrite avec un langage approprié</p>
+<p>Compilée ou interprétée</p>
+<p>Exécutée (langage machine)</p>
+</div></blockquote>
+<p>Le programme en mémoire</p>
+<blockquote>
+<div><p>Structuration de la mémoire en 3 zones logiques</p>
+<ul class="simple">
+<li>la <em>zone de code</em> contenant les instructions et constantes (partie fixe d’un programme)</li>
+<li>la <em>zone des données</em> pour les variables globales</li>
+<li>la <em>zone de pile</em> pour les variables locales et pour gérer l'empilement des appels de procédure</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">38</div>
+
+</article>
+<article class="slide level-2" id="langage-assembleur">
+<h2>Langage Assembleur</h2>
+<p>Codage direct d’un processeur (binaire)</p>
+<blockquote>
+<div><p>fastidieux, risque d’erreurs, peu d’abstraction</p>
+<p>jeu d’instruction unique par type de processeur</p>
+</div></blockquote>
+<p>Langage Assembleur</p>
+<blockquote>
+<div><p>premier niveau de langage, meilleure abstraction</p>
+<p>demande un programme pour la traduction (Assembleur)</p>
+<p>permet des vérifications</p>
+<p>autant (et plus) de langages que de processeurs</p>
+</div></blockquote>
+<p>Langages de ‘haut niveau’ (C, C++, Java, ...)</p>
+<blockquote>
+<div><p>plus haut niveau d’abstraction</p>
+<p>plus proche de la résolution de problèmes utilisateur</p>
+</div></blockquote>
+
+<div class="slide-no">39</div>
+
+</article>
+<article class="slide level-2" id="exemple-de-programme-assembleur">
+<h2>Exemple de programme assembleur</h2>
+<p>Utilisation de variables globales</p>
+<blockquote>
+<div>Plus simple à comprendre en ASM, à éviter en C</div></blockquote>
+<p>Le code source</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">40</div>
+
+</article>
+<article class="slide level-2" id="id16">
+<h2>Exemple de programme assembleur</h2>
+<p>Réservation de la mémoire</p>
+<blockquote>
+<div>définit alignement et espace réservé</div></blockquote>
+<div class="highlight-nasm"><div class="highlight"><pre><span class="nl">.L3:</span>
+        <span class="nf">.word</span>   <span class="nv">a</span>
+        <span class="nf">.word</span>   <span class="nv">b</span>
+        <span class="nf">.word</span>   <span class="nv">c</span>
+
+        <span class="nf">.comm</span>   <span class="nv">a</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+        <span class="nf">.comm</span>   <span class="nv">b</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+        <span class="nf">.comm</span>   <span class="nv">c</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+</pre></div>
+</div>
+
+<div class="slide-no">41</div>
+
+</article>
+<article class="slide level-2" id="id17">
+<h2>Exemple de programme assembleur</h2>
+<p>Initialisation des variables</p>
+<div class="highlight-nasm"><pre>@ a = 10
+        ldr     r3, .L3
+        mov     r2, #10
+        str     r2, [r3]
+
+@ b = 20
+        ldr     r3, .L3+4
+        mov     r2, #20
+        str     r2, [r3]</pre>
+</div>
+
+<div class="slide-no">42</div>
+
+</article>
+<article class="slide level-2" id="id18">
+<h2>Exemple de programme assembleur</h2>
+<p>Addition et retour de programme</p>
+<div class="highlight-nasm"><pre>@ c = a + b
+        ldr     r3, .L3
+        ldr     r2, [r3]
+        ldr     r3, .L3+4
+        ldr     r3, [r3]
+        add     r2, r2, r3
+        ldr     r3, .L3+8
+        str     r2, [r3]
+
+@ return c
+        ldr     r3, .L3+8
+        ldr     r3, [r3]
+        mov     r0, r3</pre>
+</div>
+
+<div class="slide-no">43</div>
+
+</article>
+<article class="slide level-2" id="branchements-conditionnels-1">
+<h2>Branchements conditionnels (1)</h2>
+<p>Instruction CMP</p>
+<blockquote>
+<div><p>Registre d'état (CPSR)</p>
+<blockquote>
+<div><p>indicateurs sur les résultats de la dernière opération effectuée (flags)</p>
+<p>N (négatif), Z(égal à zéro), débordement (overflow V), zéro (Z), parité (P), etc.</p>
+</div></blockquote>
+<p>CMP r2, r3</p>
+<blockquote>
+<div><p>calcule r2 - r3 sans modifier ni r2 ni r3</p>
+<p>résultats des comparaisons dans le registre d'état</p>
+</div></blockquote>
+<p>flags : r2 &lt; r3, r2 &gt; r3, r2 &lt;= r3, r2 &gt;= r3, r2 = r3, r2 != r3</p>
+<blockquote>
+<div>sont positionnés à vrai ou faux</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">44</div>
+
+</article>
+<article class="slide level-2" id="branchements-conditionnels-2">
+<h2>Branchements conditionnels (2)</h2>
+<p>l'instruction Bcc</p>
+<blockquote>
+<div><p>Bcc &lt;etiquette&gt;</p>
+<p>cc peut prendre les valeurs :</p>
+<blockquote>
+<div>GE, LE, GT, LT, EQ, NE</div></blockquote>
+<p>Ex : BLE .L1</p>
+<p>si le résultat de la comparaison &lt;= 0 est vrai, alors on continue à l'étiquette .L1 (PC &lt;= .L1, ou LDR PC, .L1)</p>
+<p>sinon on passe à l'instruction suivante</p>
+</div></blockquote>
+
+<div class="slide-no">45</div>
+
+</article>
+<article class="slide level-2" id="notion-d-algorithme">
+<h2>Notion d'algorithme</h2>
+<p>Passage du "couple" CMP, Bcc aux structures de contrôles (if/else/while/for)</p>
+<blockquote>
+<div><p>Simplification importante pour le développeur</p>
+<p>Beaucoup plus naturelle pour un être humain</p>
+<p>A permis la réflexion algorithmique</p>
+<p>Avancement majeur dans l'informatique</p>
+</div></blockquote>
+
+<div class="slide-no">46</div>
+
+</article>
+<article class="slide level-2" id="exemple-de-programme-assembleur-2">
+<h2>Exemple de programme assembleur (2)</h2>
+<p>Structure de contrôle (if)</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">47</div>
+
+</article>
+<article class="slide level-2" id="exemple-de-programme-assembleur-2b">
+<h2>Exemple de programme assembleur (2b)</h2>
+<p>Structure de contrôle (if)</p>
+<blockquote>
+<div>Déclaration des données</div></blockquote>
+<div class="highlight-nasm"><div class="highlight"><pre>        <span class="nf">.comm</span>   <span class="nv">a</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+        <span class="nf">.comm</span>   <span class="nv">b</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+        <span class="nf">.comm</span>   <span class="nv">c</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+
+<span class="nl">.L4:</span>
+        <span class="nf">.word</span>   <span class="nv">a</span>
+</pre></div>
+</div>
+
+<div class="slide-no">48</div>
+
+</article>
+<article class="slide level-2" id="id19">
+<h2>Exemple de programme assembleur (2b)</h2>
+<p>Structure de contrôle (if) suite</p>
+<div class="highlight-nasm"><pre>        ldr     r3, .L4
+        mov     r2, #10
+        str     r2, [r3]
+        ldr     r3, .L4
+        ldr     r3, [r3]
+        cmp     r3, #20
+        ble     .L2
+        ldr     r3, .L4
+        mov     r2, #30
+        str     r2, [r3]
+.L2:
+        ldr     r3, .L4
+        ldr     r3, [r3]
+        mov     r0, r3</pre>
+</div>
+
+<div class="slide-no">49</div>
+
+</article>
+<article class="slide level-2" id="exemple-de-programme-assembleur-3">
+<h2>Exemple de programme assembleur (3)</h2>
+<p>Structure de contrôle (if/else)</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+        <span class="k">else</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">50</div>
+
+</article>
+<article class="slide level-2" id="id20">
+<h2>Exemple de programme assembleur (3)</h2>
+<blockquote>
+<div>Structure de contrôle (if/else)</div></blockquote>
+<div class="highlight-c"><pre>.L5:
+        .word   a
+        .comm   a,4,4
+
+        ldr     r3, .L5         |       .L2:
+        mov     r2, #10         |               ldr     r3, .L5
+        str     r2, [r3]        |               mov     r2, #40
+        ldr     r3, .L5         |               str     r2, [r3]
+        ldr     r3, [r3]        |       .L3:
+        cmp     r3, #20         |               ldr     r3, .L5
+        ble     .L2             |               ldr     r3, [r3]
+        ldr     r3, .L5         |               mov     r0, r3
+        mov     r2, #30         |
+        str     r2, [r3]        |
+        b       .L3</pre>
+</div>
+
+<div class="slide-no">51</div>
+
+</article>
+<article class="slide level-2" id="exemple-de-programme-assembleur-4">
+<h2>Exemple de programme assembleur (4)</h2>
+<p>Structure de contrôle (while)</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">)</span> <span class="n">a</span><span class="o">++</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note : for (A; B; C){D} est identique à A; while(B){D;C;}</p>
+
+<div class="slide-no">52</div>
+
+</article>
+<article class="slide level-2" id="id21">
+<h2>Exemple de programme assembleur (4)</h2>
+<p>Structure de contrôle (while)</p>
+<div class="highlight-nasm"><pre>.L5:
+        .word   a
+        .comm   a,4,4
+
+        ldr     r3, .L5         |       .L2:
+        mov     r2, #10         |               ldr     r3, .L5
+        str     r2, [r3]        |               ldr     r3, [r3]
+        b       .L2             |               cmp     r3, #19
+.L3:                            |               ble     .L3
+        ldr     r3, .L5         |               ldr     r3, .L5
+        ldr     r3, [r3]        |               ldr     r3, [r3]
+        add     r2, r3, #1      |               mov     r0, r3
+        ldr     r3, .L5         |
+        str     r2, [r3]</pre>
+</div>
+
+<div class="slide-no">53</div>
+
+</article>
+<article class="slide level-2" id="les-tableaux">
+<h2>Les tableaux</h2>
+<p>Notion de décalage (barrel shifter)</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+        <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+        <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+        <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">54</div>
+
+</article>
+<article class="slide level-2" id="id22">
+<h2>Les tableaux</h2>
+<p>Chargement : classique</p>
+<div class="highlight-nasm"><div class="highlight"><pre><span class="nl">.L3:</span>
+        <span class="nf">.word</span>   <span class="nv">i</span>
+        <span class="nf">.word</span>   <span class="nv">a</span>
+        <span class="nf">.comm</span>   <span class="nv">i</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span>
+        <span class="nf">.comm</span>   <span class="nv">a</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">4</span>
+</pre></div>
+</div>
+
+<div class="slide-no">55</div>
+
+</article>
+<article class="slide level-2" id="id23">
+<h2>Les tableaux</h2>
+<p>Chargement : classique (suite)</p>
+<div class="highlight-nasm"><pre>ldr     r3, .L3
+mov     r2, #4
+str     r2, [r3]
+ldr     r3, .L3+4
+mov     r2, #10
+str     r2, [r3]
+ldr     r3, .L3+4
+mov     r2, #20
+str     r2, [r3, #4]
+ldr     r3, .L3+4
+mov     r2, #30
+str     r2, [r3, #8]</pre>
+</div>
+
+<div class="slide-no">56</div>
+
+</article>
+<article class="slide level-2" id="id24">
+<h2>Les tableaux</h2>
+<p>Préparation des registres</p>
+<div class="highlight-nasm"><pre>@ mettre la valeur de i (en MC à .L3) dans r2
+ldr     r3, .L3
+ldr     r2, [r3]
+
+@ mettre l'@ de début du tableau dans r3
+ldr     r3, .L3+4
+
+@ et la valeur 40 dans r1
+mov     r1, #40
+
+@ les registres sont prets...</pre>
+</div>
+
+<div class="slide-no">57</div>
+
+</article>
+<article class="slide level-2" id="id25">
+<h2>Les tableaux</h2>
+<p>Accès à a[4]</p>
+<div class="highlight-nasm"><pre>@ on met la valeur de r1 dans r3 + r2 * asl 2
+@ barrel shifter !! =&gt; asl (arithmetic shift left)
+
+str     r1, [r3, r2, asl #2]
+
+mov     r3, #0
+mov     r0, r3</pre>
+</div>
+<p>Décalage</p>
+<blockquote>
+<div><p>r1 = valeur (#40), r3 = début du tableau, r2 = nombre de cases</p>
+<p>asl 2 = décalage de 2 à gauche, en binaire (= * 4 !)</p>
+<p>décalage de r2 * 4 car index * taille d'une case</p>
+</div></blockquote>
+
+<div class="slide-no">58</div>
+
+</article>
+<article class="slide level-2" id="les-operateurs-logiques-et">
+<h2>Les opérateurs logiques: ET</h2>
+<blockquote>
+<div><p>Les opérateurs logiques sont transformés en combinaison de structures de contrôles</p>
+<blockquote>
+<div>inversion du ET reposant sur la relation : A ET B &lt;=&gt; !(!A OU !B)</div></blockquote>
+<p>Ex:</p>
+</div></blockquote>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="mi">20</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="o">&gt;</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>devient</p>
+<div class="highlight-nasm"><pre>cmp r4, #20
+ble .L4
+cmp r5, #30
+ble .L4</pre>
+</div>
+
+<div class="slide-no">59</div>
+
+</article>
+<article class="slide level-2" id="les-operateurs-logiques-ou">
+<h2>Les opérateurs logiques: OU</h2>
+<blockquote>
+<div><p>Les opérateurs logiques sont transformés en combinaison de structures de contrôles</p>
+<blockquote>
+<div>pas d'inversion car le OU est "naturel" pour le processeur</div></blockquote>
+<p>Ex:</p>
+</div></blockquote>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="mi">10</span> <span class="o">||</span> <span class="n">b</span><span class="o">&gt;</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>devient (cf slide suivant)</p>
+<blockquote>
+<div>Merci à Matthieu Charly-Desroches pour sa contribution</div></blockquote>
+
+<div class="slide-no">60</div>
+
+</article>
+<article class="slide level-2" id="id26">
+<h2>Les opérateurs logiques: OU</h2>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="mi">10</span> <span class="o">||</span> <span class="n">b</span><span class="o">&gt;</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-nasm"><pre>@ on charge a
+ldr r3, .L3
+ldr r4, [r3]
+
+@ on compare
+cmp r4, #10
+bgt .L4
+
+@ on charge b
+ldr r3, .L3+4
+ldr r4, [r3]
+
+@ on compare
+cmp r4, #20
+bgt .L4</pre>
+</div>
+
+<div class="slide-no">61</div>
+
+</article>
+<article class="slide level-2" id="notion-de-procedure">
+<h2>Notion de procédure</h2>
+<p>La procédure</p>
+<blockquote>
+<div><p>Définition : Un morceau de code réutilisable</p>
+<p>Utilité : Ne pas réécrire le code x fois</p>
+</div></blockquote>
+<p>Appel et retour de procédure</p>
+<blockquote>
+<div><p>Gérés par le développeur dans le code ?</p>
+<p>plus généralement par le compilateur</p>
+</div></blockquote>
+<p>Fonctionnement</p>
+<blockquote>
+<div>Empilement des environnements de programmes</div></blockquote>
+<p>Fonction main</p>
+<blockquote>
+<div><p>=&gt; appelle une fonction f()</p>
+<blockquote>
+<div><p>=&gt; qui appelle une fonction g()</p>
+<blockquote>
+<div>=&gt; fonction g()</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">62</div>
+
+</article>
+<article class="slide level-2" id="appels-de-procedure">
+<h2>Appels de procédure</h2>
+<p>Que se passe-t-il en mémoire centrale ?</p>
+<blockquote>
+<div><p>On utilise une pile</p>
+<p>1 - création de l'environnement du main</p>
+<p>2 - création de l'environnement du f</p>
+<p>3 - création de l'environnement du g</p>
+<p>Que contient chaque environnement ?</p>
+<blockquote>
+<div>variables locales + paramètres de la fonction + Rn, LR, PC...</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">63</div>
+
+</article>
+<article class="slide level-2" id="la-pile">
+<h2>La pile</h2>
+<p>Un espace mémoire particulier</p>
+<blockquote>
+<div><p>En mémoire centrale, ascendante ou (généralement) descendante</p>
+<blockquote>
+<div><p>Une pile est de type LIFO : on "empile" et "dépile"</p>
+<p>pour empiler on décrémente la pile, et inversement</p>
+</div></blockquote>
+<p>Deux pointeurs sont utiles pour manipuler la pile: SP et BASE</p>
+<blockquote>
+<div><p>Le registre SP (stack pointer) pointe toujours sur le bout de la pile</p>
+<p>Le registre BASE pointe toujours sur la base de la pile</p>
+</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">64</div>
+
+</article>
+<article class="slide level-2" id="id27">
+<h2>La pile</h2>
+<blockquote>
+<div><p>Comment empiler ?</p>
+<blockquote>
+<div><p>STMFD = Store Multiple Full Descending</p>
+<p>'!' signifie que SP est mis à jour en fin d'empilage</p>
+</div></blockquote>
+<p>Comment dépiler ?</p>
+<blockquote>
+<div>LDMFD = Load Multiple Full Descending</div></blockquote>
+<p>Exemples</p>
+<blockquote>
+<div><p>stmfd sp!, {r3, lr} : on sauvegarde les valeurs des registres r3 et lr dans la pile</p>
+<p>ldmfd sp!, {r3, lr} : on restore les valeurs de r3 et lr de la pile dans les registres</p>
+</div></blockquote>
+</div></blockquote>
+
+<div class="slide-no">65</div>
+
+</article>
+<article class="slide level-2" id="id28">
+<h2>La pile</h2>
+<p>Les appels de procédure dans la pile</p>
+<div class="figure">
+<a class="reference internal image-reference" href="./archis2_files/ARMv7-stack.png"><img alt="_images/ARMv7-stack.png" src="./archis2_files/ARMv7-stack.png" style="width: 27em;"></a>
+</div>
+<p>Source : ARM Ltd.</p>
+
+<div class="slide-no">66</div>
+
+</article>
+<article class="slide level-2" id="id29">
+<h2>Appels de procédure</h2>
+<p>Sauvegarde des registres dans la pile</p>
+<p>opcode : BL = BRANCH and LINK</p>
+<blockquote>
+<div><p>Sauvegarde des registres qui vont être utilisés dans la pile</p>
+<p>Restaurés en retour de procédure</p>
+<p>Comment lancer la procédure ?</p>
+<blockquote>
+<div><p>1 - Sauvegarder la valeur de PC (et autres) dans LR (ou dans la pile)</p>
+<p>2 - Mettre la valeur de début de procédure dans PC</p>
+</div></blockquote>
+<ul>
+<li><p class="first">Comment revenir et restaurer toutes les valeurs dans les registres ?</p>
+<blockquote>
+<div><p>1 - Restaurer les valeurs sauvegardées : on dépile</p>
+<p>2 - Écraser PC avec la valeur de LR ou la valeur dépilée</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+
+<div class="slide-no">67</div>
+
+</article>
+<article class="slide level-2" id="id30">
+<h2>Appels de procédure</h2>
+<p>Le code en C</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">a</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+        <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">68</div>
+
+</article>
+<article class="slide level-2" id="id31">
+<h2>Appels de procédure</h2>
+<p>Avant l'appel</p>
+<div class="highlight-nasm"><pre>@ empiler r3 et lr
+stmfd   sp!, {r3, lr}
+
+@ a = 10
+ldr     r3, .L3
+mov     r2, #10
+str     r2, [r3]
+
+@ b = 20
+ldr     r3, .L3+4
+mov     r2, #20
+str     r2, [r3]
+
+@ r2 &lt;- a
+ldr     r3, .L3
+ldr     r2, [r3]</pre>
+</div>
+
+<div class="slide-no">69</div>
+
+</article>
+<article class="slide level-2" id="id32">
+<h2>Appels de procédure</h2>
+<p>Avant l'appel (suite)</p>
+<div class="highlight-nasm"><pre>@ r3 &lt;- b
+ldr     r3, .L3+4
+ldr     r3, [r3]
+
+@ copie dans r0 et r1
+mov     r0, r2
+mov     r1, r3
+
+@ appel de f
+bl      f</pre>
+</div>
+<p>Copie de la MC vers r2 et r3 (reg. temporaires)</p>
+<p>Copie de r2 et r3 vers r0 et r1 (passage de param.)</p>
+
+<div class="slide-no">70</div>
+
+</article>
+<article class="slide level-2" id="id33">
+<h2>Appels de procédure</h2>
+<p>Dans la procédure</p>
+<blockquote>
+<div>passage de paramètres par valeur</div></blockquote>
+<div class="highlight-nasm"><pre>@ sp &lt;- sp - 8 on agrandit la pile
+sub     sp, sp, #8
+
+@ paramètre passé copié dans la pile
+str     r0, [sp, #4]
+
+@ paramètre passé copié dans la pile
+str     r1, [sp]
+
+@ de la pile vers registre de travail
+ldr     r2, [sp, #4]
+
+@ de la pile vers registre de travail
+ldr     r3, [sp]</pre>
+</div>
+
+<div class="slide-no">71</div>
+
+</article>
+<article class="slide level-2" id="id34">
+<h2>Appels de procédure</h2>
+<p>Dans la procédure (suite)</p>
+<div class="highlight-nasm"><pre>add     r3, r2, r3
+
+@ retour de fonction
+mov     r0, r3
+
+@ on dépile
+add     sp, sp, #8
+@ sp needed
+bx      lr</pre>
+</div>
+
+<div class="slide-no">72</div>
+
+</article>
+<article class="slide level-2" id="id35">
+<h2>Appels de procédure</h2>
+<p>Après l'appel</p>
+<div class="highlight-nasm"><pre>@ on récupère r0
+mov     r2, r0
+ldr     r3, .L3+8
+str     r2, [r3]
+ldr     r3, .L3+8
+ldr     r3, [r3]
+mov     r0, r3
+ldmfd   sp!, {r3, lr}
+bx      lr</pre>
+</div>
+
+<div class="slide-no">73</div>
+
+</article>
+<article class="slide level-2" id="passages-de-parametres-par">
+<h2>Passages de paramètres : par @</h2>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">a</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+        <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="o">*</span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">74</div>
+
+</article>
+<article class="slide level-2" id="id36">
+<h2>Passages de paramètres : par @</h2>
+<p>Avant la fonction</p>
+<div class="highlight-nasm"><pre>@ a = 10
+ldr     r3, .L3
+mov     r2, #10
+str     r2, [r3]
+
+@ b = 20
+ldr     r3, .L3+4
+mov     r2, #20
+str     r2, [r3]
+
+@ chargement des @ + appel de f
+ldr     r0, .L3
+ldr     r1, .L3+4
+bl      f</pre>
+</div>
+
+<div class="slide-no">75</div>
+
+</article>
+<article class="slide level-2" id="id37">
+<h2>Passages de paramètres : par @</h2>
+<p>Dans la fonction f</p>
+<div class="highlight-nasm"><pre>f:
+        @ on agrandit la pile
+        sub     sp, sp, #8
+
+        @ on empile les param
+        str     r0, [sp, #4]
+        str     r1, [sp]
+
+        @ on charge de la pile vers les registres de travail
+        ldr     r3, [sp, #4]
+        ldr     r2, [r3]
+        ldr     r3, [sp]
+        ldr     r3, [r3]</pre>
+</div>
+
+<div class="slide-no">76</div>
+
+</article>
+<article class="slide level-2" id="id38">
+<h2>Passages de paramètres : par @</h2>
+<p>Dans la fonction f (suite)</p>
+<div class="highlight-nasm"><pre>add     r3, r2, r3
+
+@ retour + dépilage
+mov     r0, r3
+add     sp, sp, #8
+@ sp needed
+bx      lr</pre>
+</div>
+
+<div class="slide-no">77</div>
+
+</article>
+<article class="slide level-2" id="id39">
+<h2>Passages de paramètres : par @</h2>
+<p>Après la fonction</p>
+<blockquote>
+<div>return c = on stocke dans la pile puis on extrait dans r0</div></blockquote>
+<div class="highlight-nasm"><div class="highlight"><pre><span class="nf">mov</span>     <span class="nv">r2</span><span class="p">,</span> <span class="nv">r0</span>
+<span class="nf">ldr</span>     <span class="nv">r3</span><span class="p">,</span> <span class="nv">.L3</span><span class="o">+</span><span class="mi">8</span>
+<span class="nf">str</span>     <span class="nv">r2</span><span class="p">,</span> <span class="p">[</span><span class="nv">r3</span><span class="p">]</span>
+<span class="nf">ldr</span>     <span class="nv">r3</span><span class="p">,</span> <span class="nv">.L3</span><span class="o">+</span><span class="mi">8</span>
+<span class="nf">ldr</span>     <span class="nv">r3</span><span class="p">,</span> <span class="p">[</span><span class="nv">r3</span><span class="p">]</span>
+<span class="nf">mov</span>     <span class="nv">r0</span><span class="p">,</span> <span class="nv">r3</span>
+</pre></div>
+</div>
+
+<div class="slide-no">78</div>
+
+</article>
+<article class="slide level-2" id="variables-locales">
+<h2>Variables locales</h2>
+<p>En langage C</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">;</span>
+        <span class="n">a</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+        <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">;</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">;</span>
+        <span class="n">d</span><span class="o">=</span><span class="mi">12</span><span class="p">;</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+
+<div class="slide-no">79</div>
+
+</article>
+<article class="slide level-2" id="id40">
+<h2>Variables locales</h2>
+<p>En assembleur</p>
+<div class="highlight-nasm"><pre>    @ on agrandit la pile
+sub sp, sp, #16
+
+    @ a = 10 (dans la pile)
+    mov     r3, #10
+    str     r3, [sp, #12]
+
+    @ b = 20 (dans la pile)
+    mov     r3, #20
+    str     r3, [sp, #8]
+
+    @ lire a dans la pile
+    ldr     r2, [sp, #12]
+
+    @ lire b dans la pile
+    ldr     r3, [sp, #8]</pre>
+</div>
+
+<div class="slide-no">80</div>
+
+</article>
+<article class="slide level-2" id="id41">
+<h2>Variables locales</h2>
+<p>En assembleur (suite)</p>
+<div class="highlight-nasm"><pre>add     r3, r2, r3
+
+@ on stocke le résultat dans la pile
+str     r3, [sp, #4]
+
+@ d = 12
+mov     r3, #12
+str     r3, [sp]
+
+@ return 0
+mov     r3, #0
+mov     r0, r3
+
+@ on dépile
+add     sp, sp, #16
+bx      lr</pre>
+</div>
+
+<div class="slide-no">81</div>
+
+</article>
+
+
+<div class="slide-area" id="prev-slide-area"></div><div class="slide-area" id="next-slide-area"></div></section>
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2013.10.15',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="./archis2_files/jquery.js"></script>
+    <script type="text/javascript" src="./archis2_files/underscore.js"></script>
+    <script type="text/javascript" src="./archis2_files/doctools.js"></script>
+    <script type="text/javascript" src="./archis2_files/common.js"></script>
+    <script type="text/javascript" src="./archis2_files/slides.js"></script>
+    <script type="text/javascript" src="./archis2_files/sync.js"></script>
+    <script type="text/javascript" src="./archis2_files/controller.js"></script>
+    <script type="text/javascript" src="./archis2_files/init.js"></script>
+    
+  
+</body></html>

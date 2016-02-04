@@ -1,0 +1,42 @@
+article {
+    background-color: green;
+    line-height: 1em;
+}
+
+h2 {
+	padding: 15px;
+}
+
+h3 {
+	font-size: 28pt;
+}
+
+blockquote {
+	font-size: 0.8em;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+p {
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+ul {
+	margin: 5px 0 0 0.75em;
+}
+
+ul li:before {
+   content: "•";
+   font-size: 1.2em; /* or whatever */
+}
+
+ul li {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+ul ul li {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}

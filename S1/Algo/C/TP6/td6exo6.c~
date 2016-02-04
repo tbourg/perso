@@ -1,0 +1,50 @@
+#include<stdio.h>
+#include<string.h>
+
+void retirer_chariot(char *chaine)
+/*
+:entree/sortie chaine : chaine de caracteres
+:pre-cond : chaine contient le caractere '\n' avant le caractere '\0'
+:post-cond : supprime '\n' de chaine en le remplaçant par '\0'
+*/
+{
+ int i=0;
+ while(chaine[i]!='\n') i++;
+ chaine[i]='\0';
+}
+
+void affiche_rec(char *chaine)
+/*
+:entree chaine : chaine de caracteres
+:post-cond : affiche a l'envers les caracteres de chaine a partir du caractere d'indice i
+*/
+{
+ if(chaine[0]!='\0')
+  {
+    affiche_rec(chaine+1);
+    printf("%c",chaine[0]);
+  }
+}
+
+void affiche_envers(char *chaine)
+/*
+:entree chaine : chaine de caracteres
+:post-cond : affiche a l'envers les caracteres de chaine
+*/
+{
+ affiche_rec(chaine,0);
+}
+
+
+
+
+int main()
+{
+    char chaine1[100];
+    printf("Saisir une chaine de caracteres : ");
+    fgets(chaine1,100,stdin);
+    retirer_chariot(chaine1);
+    affiche_envers(chaine1);
+    printf("\n");
+    return 0;
+}
