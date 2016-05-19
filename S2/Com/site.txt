@@ -1,0 +1,40 @@
+--TITRE-- BOURG Thomas --TITRE--
+-- Dans le monde il y a 10 types de personnes, --
+-- ceux qui comprennent le binaire, et les autres. --
+
+--titre-Accueil
+Bienvenue sur mon site personnel.
+Si vous voulez apprendre à me connaître, vous êtes au bon endroit, mais si vous ne me connaissez pas encore, vous pouvez ici me découvrir.
+
+-titre-Ma vie.
+J'espère que vous êtes au courant, mais pour les distraits mon nom à moi c'est Thomas BOURG. Je suis né dans la belle ville de Montpellier, mais mes parents étant tous deux ardéchois, c'est en Ardèche que j'ai grandi. Si vous connaissez un peu la géographie française vous devez savoir que l'Ardèche n'est pas un exemple d'urbannisation, j'ai donc déroulé toute ma scolarité dans la ville de Montélimar (dans la Drôme). Puis les études supérieures se rapprochant, j'ai débarqué dans la cour des grands en arrivant à Lyon.
+
+-titre-Mon parcours
+tableau: Diplomes
+Brevet des collèges - mention très bien
+Brevet d'initiation à l'aéronautique
+Baccalauréat - mention bien
+DUT Informatique (en cours - semestre 1 validé)
+
+-titre-mes projets
+"J'aurais voulu être un artiste" chantait Claude Dubois dans la comédie musicale Starmania. Réécrit pour moi ça donnnerai plutôt "j'aurai voulu être un pilote", en effet j'ai toujours voulu piloter un avion et c'est ce que j'ai fait en passant mon BIA (brevet d'initiation à l'aéronautique). Mais de là à en faire mon métier je n'étais plus très sûr, donc j'ai choisi informatique, il y a moins d'enjeu et moins de turbulence. Dans l'informatique c'est encore très vague, j'ai donc choisi un DUT au cas où ça ne me plairait pas (ce qui pour l'instant n'est pas le cas). Et pour la suite j'envisage une école d'ingénieur parce que dire "je suis ingénieur" c'est quand même la classe.
+
+-titre-mes passions
+Je ne me caractériserait pas comme quelqu'un de très sportif, mais pendant toute ma jeunesse j'ai pratiqué le judo. J'ai réussi à atteindre le niveau de la ceinture noire en technique, cependant je n'ai jamais eu l'esprit compétiteur, ce qui m'a empéché d'aller plus loin.
+
+Après comme la plupart des jeunes de mon âge je passe du temps sur l'ordinateur, j'aime regarder la télé, bref les nouvelles technologie c'est mon truc.
+
+Pour finir, j'aime beaucoup voyager, découvrir de nouveaux paysages, de nouvelles cultures. Je souhaiterais donc un métier qui s'accorde avec les voyages, soit de longues vacances, soit un métier où je me déplace.
+
+-titre-CONTACT
+BOURG Thomas
+
+19 rue St Michel
+69003 Lyon, France
+
+quartier Chasser
+07220 St Thome, France
+
+Tél :+33 6 58 46 77 44
+Email : thomas.bourg@etu.univ-lyon1.fr
+Email perso : tbourg07@gmail.com
