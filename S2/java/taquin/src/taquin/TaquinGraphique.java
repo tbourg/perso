@@ -69,12 +69,12 @@ public class TaquinGraphique extends JFrame implements ActionListener {
      * au tableau de jeu
      */
     public void initJLabel() {
-        for (int i = 0; i < grilleGraphique.length; i++) {
-            for (int j = 0; j < grilleGraphique[i].length; j++) {
-                grilleGraphique[i][j] = new JButton();
-                grilleGraphique[i][j].setPreferredSize(new Dimension(110, 110));
-                grilleGraphique[i][j].addActionListener(this);
-                grille.add(grilleGraphique[i][j]);
+        for (JButton[] grilleGraphique1 : grilleGraphique) {
+            for (int j = 0; j < grilleGraphique1.length; j++) {
+                grilleGraphique1[j] = new JButton();
+                grilleGraphique1[j].setPreferredSize(new Dimension(110, 110));
+                grilleGraphique1[j].addActionListener(this);
+                grille.add(grilleGraphique1[j]);
             }
         }
     }

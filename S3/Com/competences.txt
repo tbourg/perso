@@ -1,0 +1,8 @@
+Langages: Python, C/C++, Java
+Web: HTML 5, CSS3, PHP
+Outils de modélisation: Diagrammes UML, Modèle MERISE
+OS: Windows, GNU/Linux
+SGBD: Oracle SQL
+Réseau: 
+Logiciel:
+Archi:
