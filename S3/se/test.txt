@@ -1,0 +1,39 @@
+Chapitre 1:
+1. freedos, centos, mac os, ms windows
+2. operating system
+3. aide, abstraction, autorisation, augmentation et arbitrage
+4. simplifier l'acces aux peripheriques
+5. donner les mêmes fonctionnalites a des peripheriques différents
+6. simuler des ressources non disponibles(multi-tache)
+7. arbitrer les acces eux ressources
+8. gestion des droits pour les différents utilisateurs
+9. unification des entrees/sorties et notion de processus
+10. une machine virtuelle
+
+Chapitre 2:
+1. elle procede a un appel systeme
+2. en mode superviseur pour avoir acces aux ressources
+3. le programme passe un appel, le se prend la main, il execute la fonction requise en mode superviseur, puis il rend la main au programme
+4. le noyau
+5. le programme attend le reour de son appel pour continuer, mais un autre programme peut en profiter pour s'executer
+6. il gere l'arbitrage du processeurs
+7. il doit garantir l'equite (chaque processus peut acceder au processeur) et eviter la famine (un processus attend indefiniment apres un appel systeme)
+8. l'horloge genere une interruption a intervalle de temps regulier, et l'ordonnanceur doit changer le processus execute a chaque fois
+9. le code d'erreur (fopen renvoie -1 en cas d'erreur d'ecriture) ou l'exception
+10. oui, si toutes les ressources sont utilisees par les autres processus
+
+Chapitre 3:
+1. un processus est une execution d'un programme (objet/instance)
+2. ps
+3. top
+4. memoire ett ressource processeur
+5. PID Processus ID 
+6. le pcb process control block
+7. pour des questions de securite, si besoin de diminuer ses droits
+8. code
+
+int pid_fils = fork();
+if (pid_fils == 0) return fonction_fils();
+              else return fonction_père();
+9. a executer un processus en root
+10. 
