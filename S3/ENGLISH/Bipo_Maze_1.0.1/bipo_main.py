@@ -8,7 +8,7 @@
 #!/usr/bin/env python
 
 #-----------------------Libs import-----------------------#
-from pygame import init, display, Color, key, quit, joystick, time
+from pygame import init, display, Color, key, quit, joystick, time, font
 from pygame.locals import *
 from sys import exit
 # FIN
@@ -23,7 +23,7 @@ def main(difficulty):
     #---------------------Pygame init--------------------#
     init()
 
-
+    myfont = font.SysFont("monospace", 15)
     #Création de la fenêtre
     WW, WH = 640, 480
     Window = display.set_mode((WW, WH))
@@ -35,15 +35,13 @@ def main(difficulty):
     # FIN
 
     if difficulty == 1:
-        taille = 6
+        taille = 10
     elif difficulty == 2:
-        taille = 9
+        taille = 11
     elif difficulty == 3:
         taille = 12
 
-    #---------------------Typgame--------------------#
-    Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 229, height = 470)
-    Frame.place((401, 0))
+
     #---------------------Some variables--------------------#
     mylaby = laby(taille, taille)
     mylaby.generate_laby()
@@ -55,36 +53,18 @@ def main(difficulty):
     # FIN
 
 
-    if joystick.get_count() > 0:
-        Joy = joystick.Joystick(0)
-        Joy.init()
-
-
     while True:
         time.Clock().tick(30)
-        Window.fill(const.Porange)    
+        Window.fill(const.Porange)
+
+        time_play = time.get_ticks()/1000
+        label = myfont.render(str(time_play), 1, (0,0,0))
+        Window.blit(label, (200, 0))
 
         for event in handle_widgets():
             if event.type == QUIT:
                 quit()
                 exit()
-                        
-            elif event.type == JOYAXISMOTION:
-                if event.axis == 1:
-                    if round(event.value) < 0:
-                        if not perso.che_jaune:
-                            perso.move(const.up)
-                    if round(event.value) > 0:
-                        if not perso.che_jaune:
-                            perso.move(const.down)
-                if event.axis == 0:
-                    if round(event.value) < 0:
-                        if not perso.che_jaune:
-                            perso.move(const.left)
-                    if round(event.value) > 0:
-                        if not perso.che_jaune:
-                            perso.move(const.right)
-            
             
         keys = key.get_pressed()
         if keys:
@@ -100,12 +80,7 @@ def main(difficulty):
             if keys[K_RIGHT]:
                 if not perso.che_jaune:
                     perso.move(const.right)
-                    
-
-        if time.get_ticks() - perso_time >= const.time_perso_poll:
-            perso_time = time.get_ticks()
-            perso.poll()
-
+                   
 
         perso.show(Window)
         render_widgets()

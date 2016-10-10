@@ -10,15 +10,6 @@
 from pygame import image, Rect, draw, Surface
 from pygame.locals import *
 from random import randint, choice
-from math import sqrt
-
-
-"""
-Fonction:
-"""
-
-def distance(p1, p2):
-    return(sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2))
 
 
 """
@@ -159,114 +150,7 @@ class Perso(object):
                 
             self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
             
-    def astar(self, dest):
-        desti = Point(dest)
-        openL = []
-        closeL = []
-        
-        debut = self.laby.get_cell(self.x, self.y)
-        openL.append(debut)
-        
-        debut.Fille = distance((self.x, self.y), (desti.x, desti.y))
-        debut.Garcon = 0
-        debut.Homme = distance((self.x, self.y), (desti.x, desti.y))
-        debut.parent = None
-        
-        while 1:
-            if len(openL) <= 0:
-                break
-            
-            min , min_id = openL[0].Fille, 0
-            
-            for id, cell in enumerate(openL[1:]):
-                if cell.Fille < min:
-                    min = cell.Fille
-                    min_id = id + 1
-                    
-            closeL.append(openL[min_id])
-
-            
-            if openL[min_id].x == desti.x and openL[min_id].y == desti.y:
-                break
-            
-            self._traitement(closeL, openL, openL[min_id].x + 1, openL[min_id].y, const.right, openL[min_id], desti)
-            self._traitement(closeL, openL, openL[min_id].x - 1, openL[min_id].y, const.left, openL[min_id], desti)
-            self._traitement(closeL, openL, openL[min_id].x, openL[min_id].y - 1, const.up, openL[min_id], desti)
-            self._traitement(closeL, openL, openL[min_id].x, openL[min_id].y + 1, const.down, openL[min_id], desti)
-            
-            openL.remove(openL[min_id])
-            
-            
-        
-        
-    def _traitement(self, closeL, openL, x, y, dir, parent, desti):
-        if parent.gate[dir]:
-            return
-        
-        c = self.laby.get_cell(x, y)
-        
-        if c in closeL:
-            return
-        
-        if c in openL:
-            Garcon = distance((x, y), (parent.x, parent.y))
-            c.dir = self.laby.notdir(dir)
-            
-            if Garcon < c.Garcon:
-                c.Garcon = Gracon
-                c.Fille = c.Homme + c.Garcon
-                c.parent = parent
-                
-        else:
-            c.parent = parent
-            c.dir = self.laby.notdir(dir)
-            c.Garcon = distance((x, y), (parent.x, parent.y))
-            c.Homme = distance((x, y), (desti.x, desti.y))
-            c.Fille = c.Homme + c.Garcon
-            openL.append(c)
-            
-    def get_astar(self, csource, cdesti):
-        
-        source = self.laby.get_cell(csource[0], csource[1])
-        desti = self.laby.get_cell(cdesti[0], cdesti[1])
-        
-        actuel = desti
-        chemain = []
-        
-        while actuel and (actuel.x != source.x or actuel.y != source.y):
-            if actuel.x == actuel.parent.x - 1:
-                self.che_jaune.append(actuel)
-                chemain.append(const.right)
-            if actuel.x == actuel.parent.x + 1:
-                self.che_jaune.append(actuel)
-                chemain.append(const.left)
-            if actuel.y == actuel.parent.y - 1:
-                self.che_jaune.append(actuel)
-                chemain.append(const.down)
-            if actuel.y == actuel.parent.y + 1:
-                self.che_jaune.append(actuel)
-                chemain.append(const.up)
-                
-            actuel = actuel.parent
-            
-        che_retour = []        
-        id = len(chemain) - 1
-        
-        while id >= 0:
-            che_retour.append(self.laby.notdir(chemain[id]))
-            id -= 1
-            
-        
-        return che_retour
-        
-    def poll(self):
-        if self.chemain:
-            self.move(self.chemain.pop(0))
-            self.che_jaune.pop(0)
-            
-    def go_to(self, che):
-        self.chemain = che
-        
+    
         
 class laby(object):
     def __init__(self, w = 25, h = 30, sx = 0, sy = 0):
